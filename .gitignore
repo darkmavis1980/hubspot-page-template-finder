@@ -1,0 +1,6 @@
+__pycache__
+.env*
+conf/*
+!conf/*.sample.ini
+csv/*.csv
+report.txt
