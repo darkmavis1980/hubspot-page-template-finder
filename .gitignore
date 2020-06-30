@@ -5,3 +5,4 @@ conf/*
 csv/*.csv
 reports/*.txt
 report.txt
+.DS_Store

@@ -4,6 +4,7 @@ import csv
 from datetime import datetime
 import json
 import requests
+import os
 
 def get_config():
     config = configparser.ConfigParser()
@@ -66,7 +67,8 @@ def parse_csv(file, report_name = None):
 
     current_date = datetime.today()
     current_date = current_date.strftime("%d-%m-%Y-%H-%M-%S")
-    filename = "reports/report-{}.txt".format(current_date)
+    src_filename = os.path.splitext(os.path.basename(file))[0]
+    filename = "reports/{}-{}.txt".format(src_filename, current_date)
     if report_name:
         filename = "reports/{}-{}.txt".format(report_name, current_date)
     with open(filename, "w+") as report_file:
