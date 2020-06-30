@@ -19,6 +19,11 @@ Once you cloned the repository, installed the dependencies, simply run as follow
 pipenv shell
 
 python . csv/YOURFILE.CSV
+
+# If you want to add a custom prefix name to the report add --name
+python . csv/YOURFILE.CSV --name="CustomReport"
+# Will generate report/CustomReport-30-06-2020-13-03-04.txt
+
 ```
 
 Once finished, you will find the report file in the `reports` folder.

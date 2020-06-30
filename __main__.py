@@ -39,7 +39,7 @@ def get_ids(rows, headers):
         ids.append(row[index])
     return ids
 
-def parse_csv(file):
+def parse_csv(file, report_name = None):
     """
     Get the rows from the passed CSV file, then it does a request for each ID and parses the body response to find for templates
     """
@@ -67,6 +67,8 @@ def parse_csv(file):
     current_date = datetime.today()
     current_date = current_date.strftime("%d-%m-%Y-%H-%M-%S")
     filename = "reports/report-{}.txt".format(current_date)
+    if report_name:
+        filename = "reports/{}-{}.txt".format(report_name, current_date)
     with open(filename, "w+") as report_file:
         for t in templates:
             report_file.write("{}\n".format(t))
@@ -77,9 +79,10 @@ def init():
     """
     parser = argparse.ArgumentParser(description='Parse a CSV file to find HubSpot pages templates')
     parser.add_argument('file', metavar='FILE', help='The file to parse')
+    parser.add_argument('-n', '--name', help='Set a name for the report')
     args = parser.parse_args()
     if args.file:
-        parse_csv(args.file)
+        parse_csv(args.file, args.name)
 
 if __name__ == "__main__":
     init()
