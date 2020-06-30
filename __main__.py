@@ -1,11 +1,11 @@
+import argparse
 import configparser
 import csv
+from datetime import datetime
 import json
 import requests
 
-file = "csv/test.csv"
-
-def getConfig():
+def get_config():
     config = configparser.ConfigParser()
     try:
         config.read('./conf/conf.ini')
@@ -13,22 +13,22 @@ def getConfig():
     except:
         raise Exception("Cannot read the configuration file")
 
-def readCSV(file):
+def read_csv(file):
     """
     Reads a CSV file and returns the result rows
     """
     rows = []
-    with open(file) as csvFile:
-        csvRows = csv.reader(csvFile, delimiter=',', quotechar='"')
-        headers = next(csvRows)
-        for row in csvRows:
+    with open(file) as csv_file:
+        csv_rows = csv.reader(csv_file, delimiter=',', quotechar='"')
+        headers = next(csv_rows)
+        for row in csv_rows:
             rows.append(row)
     data = dict()
     data['rows'] = rows
     data['headers'] = headers
     return data
 
-def getIds(rows, headers):
+def get_ids(rows, headers):
     """
     Parse the rows and returns an array with all the IDs
     """
@@ -39,17 +39,17 @@ def getIds(rows, headers):
         ids.append(row[index])
     return ids
 
-def parseCSV(file):
+def parse_csv(file):
     """
     Get the rows from the passed CSV file, then it does a request for each ID and parses the body response to find for templates
     """
-    config = getConfig()
+    config = get_config()
     hapikey = config.get('HUBSPOT', 'HAPIKEY')
     api_url_base = config.get('HUBSPOT', 'API_URL')
-    csvData = readCSV(file)
-    headers = csvData["headers"]
-    csvRows = csvData["rows"]
-    ids = getIds(csvRows, headers)
+    csv_data = read_csv(file)
+    headers = csv_data["headers"]
+    csv_rows = csv_data["rows"]
+    ids = get_ids(csv_rows, headers)
     templates = []
     for id in ids:
         api_url = api_url_base.format(id, hapikey)
@@ -64,9 +64,22 @@ def parseCSV(file):
             print("Error: Couldn't fetch page ID: {}".format(id))
             pass
 
-    with open("report.txt", "w+") as reportFile:
+    current_date = datetime.today()
+    current_date = current_date.strftime("%d-%m-%Y-%H-%M-%S")
+    filename = "reports/report-{}.txt".format(current_date)
+    with open(filename, "w+") as report_file:
         for t in templates:
-            reportFile.write("{}\n".format(t))
+            report_file.write("{}\n".format(t))
+
+def init():
+    """
+    Init the CLI with the arguments and start the parsing process
+    """
+    parser = argparse.ArgumentParser(description='Parse a CSV file to find HubSpot pages templates')
+    parser.add_argument('file', metavar='FILE', help='The file to parse')
+    args = parser.parse_args()
+    if args.file:
+        parse_csv(args.file)
 
 if __name__ == "__main__":
-    parseCSV(file)
+    init()
